@@ -46,34 +46,27 @@ function loadClient() {
   );
 }
 
-function loadLocations() {
-  return gapi.client.sheets.spreadsheets.values
-    .get({
-      spreadsheetId: "1T-OE9_qtHuFrp4i7PDuKUwgMhDdkDJpn03Axm62x3Dk",
-      range: "LOCATIONS!A1:D1000",
-    })
-    .then(
-      (response) => response.result.values.forEach(addMarker),
-      (err) => console.error("Execute error", err)
-    );
-}
-
 function loadCategories() {
   return gapi.client.sheets.spreadsheets.values
     .get({
       spreadsheetId: "1T-OE9_qtHuFrp4i7PDuKUwgMhDdkDJpn03Axm62x3Dk",
-      range: "LOCATIONS!A1:D1000",
+      range: "CATEGORIES!A2:B1000",
     })
     .then(
-      function (response) {
-        // Handle the results here (response.result has the parsed body).
-        console.log("Response", response);
-        console.log(response.result.values);
-        response.result.values.forEach(addMarker);
-      },
-      function (err) {
-        console.error("Execute error", err);
-      }
+      (response) => response.result.values.forEach(addCategory),
+      (err) => console.error("Execute error", err)
+    );
+}
+
+function loadLocations() {
+  return gapi.client.sheets.spreadsheets.values
+    .get({
+      spreadsheetId: "1T-OE9_qtHuFrp4i7PDuKUwgMhDdkDJpn03Axm62x3Dk",
+      range: "LOCATIONS!A2:D1000",
+    })
+    .then(
+      (response) => response.result.values.forEach(addMarker),
+      (err) => console.error("Execute error", err)
     );
 }
 
@@ -91,8 +84,10 @@ class Location {
   }
 
   buildMarker() {
+    if (!this.isValid()) return null;
+
     return new maplibregl.Marker({
-      color: "red",
+      color: this.category.getColor(),
     }).setLngLat([this.lng, this.lat]);
   }
 
@@ -106,10 +101,15 @@ class Location {
 }
 
 class Category {
-  constructor(name) {
+  constructor(name, color) {
     this.name = name;
+    this.color = color;
     this.isActive = readLocalStorage(this.isActiveKey(), "true") === "true";
     this.locations = [];
+  }
+
+  getColor() {
+    return `#${this.color}`;
   }
 
   isActiveKey() {
@@ -126,16 +126,23 @@ class Category {
   }
 }
 
-function addMarker(data, i) {
+function addCategory(data) {
   const categoryName = data[0];
+  const color = data[1];
 
   if (!categories[categoryName]) {
-    categories[categoryName] = new Category(categoryName);
+    categories[categoryName] = new Category(categoryName, color);
   }
-  const location = new Location(data[1], data[2], data[3]);
+
+  return categories[categoryName];
+}
+
+function addMarker(data) {
+  const category = addCategory([data[0], "ff0000"]);
+  const location = new Location(data[1], data[2], data[3], category);
 
   if (location.isValid()) {
-    categories[categoryName].add(location);
+    category.add(location);
   } else {
     console.log("Invalid location", location.name, location.lat, location.lng);
   }
@@ -176,20 +183,22 @@ function buildCheckboxes() {
     checkbox.value = category.name;
     checkbox.checked = category.isActive;
 
+    const span = document.createElement("span");
+    span.style.borderColor = category.getColor();
+    span.appendChild(document.createTextNode(category.name));
+
     const label = document.createElement("label");
-    label.appendChild(document.createTextNode(category.name));
     label.appendChild(checkbox);
+    label.appendChild(span);
 
     document.querySelector("#controls").appendChild(label);
   });
 }
 
-// gapi.load("client", function () {
-//   loadClient().then(execute);
-// });
-
-addMarker(["One", "", "41.8726358", "-87.6395327"], 0);
-addMarker(["Two", "", "41.9014178", "-87.6428567"], 1);
-addMarker(["Three", "", "41.8726358", "-87.6428567"], 2);
-buildCheckboxes();
-render();
+gapi.load("client", function () {
+  loadClient()
+    .then(loadCategories)
+    .then(loadLocations)
+    .then(buildCheckboxes)
+    .then(render);
+});
