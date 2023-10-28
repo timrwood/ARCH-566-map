@@ -62,7 +62,7 @@ function loadLocations() {
   return gapi.client.sheets.spreadsheets.values
     .get({
       spreadsheetId: "1T-OE9_qtHuFrp4i7PDuKUwgMhDdkDJpn03Axm62x3Dk",
-      range: "LOCATIONS!A2:D1000",
+      range: "LOCATIONS!A2:F1000",
     })
     .then(
       (response) => response.result.values.forEach(addMarker),
@@ -71,11 +71,13 @@ function loadLocations() {
 }
 
 class Location {
-  constructor(name, lat, lng, category) {
+  constructor(name, lat, lng, address, city, category) {
     this.name = name;
     this.lat = +lat;
     this.lng = +lng;
     this.category = category;
+    this.address = address;
+    this.city = city;
     this.marker = this.buildMarker();
   }
 
@@ -86,9 +88,17 @@ class Location {
   buildMarker() {
     if (!this.isValid()) return null;
 
-    return new maplibregl.Marker({
-      color: this.category.getColor(),
-    }).setLngLat([this.lng, this.lat]);
+    // create marker with popup
+    return new maplibregl.Marker({ color: this.category.getColor() })
+      .setLngLat([this.lng, this.lat])
+      .setPopup(new maplibregl.Popup().setHTML(this.html()));
+  }
+
+  html() {
+    return [
+      `<b>${this.name || this.category.name}</b>`,
+      `${this.address}, ${this.city}`,
+    ].join("<br/>");
   }
 
   add() {
@@ -139,7 +149,14 @@ function addCategory(data) {
 
 function addMarker(data) {
   const category = addCategory([data[0], "ff0000"]);
-  const location = new Location(data[1], data[2], data[3], category);
+  const location = new Location(
+    data[1],
+    data[2],
+    data[3],
+    data[4],
+    data[5],
+    category
+  );
 
   if (location.isValid()) {
     category.add(location);
