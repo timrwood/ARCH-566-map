@@ -16,7 +16,8 @@ function readLocalStorage(key, defaultValue) {
 
 var map = new maplibregl.Map({
   container: "map",
-  style: "https://tiles.stadiamaps.com/styles/stamen_toner.json", // Style URL; see our documentation for more options
+  // style: "https://tiles.stadiamaps.com/styles/stamen_toner.json", // Style URL; see our documentation for more options
+  style: "style.json", // Style URL; see our documentation for more options
   center: [
     +readLocalStorage("map.lng", -87.7),
     +readLocalStorage("map.lat", 41.86),
