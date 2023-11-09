@@ -1587,7 +1587,7 @@
       ],
       "layout": { "line-cap": "round", "line-join": "round" },
       "paint": {
-        "line-color": "hsl(0, 0%, 45%)",
+        "line-color": "hsl(0, 0%, 0%)",
         "line-dasharray": [
           "step",
           ["zoom"],
@@ -1597,7 +1597,18 @@
           9,
           ["literal", [0.25, 2]]
         ],
-        "line-width": ["interpolate", ["linear"], ["zoom"], 1.5, 0.3, 9, 2]
+        "line-opacity": 0.3,
+        "line-width": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          1.5,
+          0.3,
+          9,
+          2,
+          10,
+          0
+        ]
       }
     },
     {
@@ -1624,6 +1635,7 @@
           8.5,
           ["literal", [2, 2]]
         ],
+        "line-opacity": 0.3,
         "line-width": ["interpolate", ["linear"], ["zoom"], 0, 1, 6, 2]
       }
     },

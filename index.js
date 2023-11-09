@@ -4,6 +4,15 @@
  * https://developers.google.com/explorer-help/code-samples#javascript
  */
 
+const glyphs = ["×", "†", "⏹", "⁕", "◨", "⊠", "⏶", "‡", "⏺", "◒", "◑"];
+let glyphIndex = 0;
+
+function nextGlyph() {
+  const glyph = glyphs[glyphIndex];
+  glyphIndex = (glyphIndex + 1) % glyphs.length;
+  return glyph;
+}
+
 function writeLocalStorage(key, value) {
   localStorage.setItem(key, value);
 }
@@ -90,7 +99,12 @@ class Location {
     if (!this.isValid()) return null;
 
     // create marker with popup
-    return new maplibregl.Marker({ color: this.category.getColor() })
+    const el = document.createElement("div");
+    el.className = "marker";
+    el.textContent = this.category.glyph;
+    el.style.color = this.category.getColor();
+
+    return new maplibregl.Marker({ element: el })
       .setLngLat([this.lng, this.lat])
       .setPopup(new maplibregl.Popup().setHTML(this.html()));
   }
@@ -115,6 +129,7 @@ class Category {
   constructor(name, color) {
     this.name = name;
     this.color = color;
+    this.glyph = nextGlyph();
     this.isActive = readLocalStorage(this.isActiveKey(), "true") === "true";
     this.locations = [];
   }
@@ -202,8 +217,13 @@ function buildCheckboxes() {
     checkbox.checked = category.isActive;
 
     const span = document.createElement("span");
-    span.style.borderColor = category.getColor();
+    span.classList.add("category");
     span.appendChild(document.createTextNode(category.name));
+
+    const glyph = document.createElement("span");
+    glyph.classList.add("glyph");
+    glyph.appendChild(document.createTextNode(category.glyph));
+    span.appendChild(glyph);
 
     const label = document.createElement("label");
     label.appendChild(checkbox);
