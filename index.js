@@ -4,15 +4,6 @@
  * https://developers.google.com/explorer-help/code-samples#javascript
  */
 
-const glyphs = ["×", "†", "⏹", "⁕", "◨", "⊠", "⏶", "‡", "⏺", "◒", "◑"];
-let glyphIndex = 0;
-
-function nextGlyph() {
-  const glyph = glyphs[glyphIndex];
-  glyphIndex = (glyphIndex + 1) % glyphs.length;
-  return glyph;
-}
-
 function writeLocalStorage(key, value) {
   localStorage.setItem(key, value);
 }
@@ -102,7 +93,6 @@ class Location {
     const el = document.createElement("div");
     el.className = "marker";
     el.textContent = this.category.glyph;
-    el.style.color = this.category.getColor();
 
     return new maplibregl.Marker({ element: el })
       .setLngLat([this.lng, this.lat])
@@ -126,16 +116,11 @@ class Location {
 }
 
 class Category {
-  constructor(name, color) {
+  constructor(name, glyph) {
     this.name = name;
-    this.color = color;
-    this.glyph = nextGlyph();
+    this.glyph = glyph;
     this.isActive = readLocalStorage(this.isActiveKey(), "true") === "true";
     this.locations = [];
-  }
-
-  getColor() {
-    return `#${this.color}`;
   }
 
   isActiveKey() {
@@ -156,7 +141,7 @@ function addCategory(data) {
   const categoryName = data[0];
   const color = data[1];
 
-  if (!categories[categoryName]) {
+  if (categoryName && !categories[categoryName]) {
     categories[categoryName] = new Category(categoryName, color);
   }
 
@@ -164,7 +149,7 @@ function addCategory(data) {
 }
 
 function addMarker(data) {
-  const category = addCategory([data[0], "ff0000"]);
+  const category = addCategory([data[0], "?"]);
   const location = new Location(
     data[1],
     data[2],
