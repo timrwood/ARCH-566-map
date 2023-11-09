@@ -11,6 +11,25 @@ body {
   z-index: 0;
 }
 
+.page #map {
+  width: 975px; /* 6.5 in * 300 dpi; */
+  height: 1350px;  /* 9 in * 300 dpi; */
+}
+
+.plot #map {
+  width: 3027px; /* 34 in * 150 dpi; */
+  height: 4096px;  /* 46 in * 150 dpi; */
+  transform-origin: 0 0;
+  scale: 20%;
+}
+
+.page .maplibregl-control-container,
+.page #controls,
+.plot .maplibregl-control-container,
+.plot #controls {
+  display: none;
+}
+
 #controls {
   position: fixed;
   right: 20px;

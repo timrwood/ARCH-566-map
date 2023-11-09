@@ -14,15 +14,29 @@ function readLocalStorage(key, defaultValue) {
   return value;
 }
 
+var lng = +readLocalStorage("map.lng", -87.7);
+var lat = +readLocalStorage("map.lat", 41.86);
+var zoom = +readLocalStorage("map.zoom", 10);
+
+if (location.search === "?page") {
+  document.body.classList.add("page");
+  lng = -87.7;
+  lat = 41.86;
+  zoom = 10.5;
+}
+
+if (location.search === "?plot") {
+  document.body.classList.add("plot");
+  lng = -87.7;
+  lat = 41.86;
+  zoom = 11.5;
+}
+
 var map = new maplibregl.Map({
   container: "map",
-  // style: "https://tiles.stadiamaps.com/styles/stamen_toner.json", // Style URL; see our documentation for more options
-  style: "style.json", // Style URL; see our documentation for more options
-  center: [
-    +readLocalStorage("map.lng", -87.7),
-    +readLocalStorage("map.lat", 41.86),
-  ], // Initial focus coordinate
-  zoom: +readLocalStorage("map.zoom", 10),
+  style: "style.json",
+  center: [lng, lat],
+  zoom: zoom,
 });
 
 // Add zoom and rotation controls to the map.
