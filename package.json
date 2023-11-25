@@ -1,0 +1,14 @@
+{
+  "name": "arch-566-map",
+  "version": "1.0.0",
+  "description": "## Color",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "puppeteer": "^21.5.2"
+  }
+}

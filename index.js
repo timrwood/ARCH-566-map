@@ -20,9 +20,11 @@ var zoom = +readLocalStorage("map.zoom", 10);
 
 if (location.search === "?page") {
   document.body.classList.add("page");
-  lng = -87.7;
+  lng = -87.65;
   lat = 41.86;
-  zoom = 10.5;
+  zoom = 14;
+
+  // 0.5 = 1165 px = 0.5688476562
 }
 
 if (location.search === "?plot") {
@@ -34,10 +36,32 @@ if (location.search === "?plot") {
 
 var map = new maplibregl.Map({
   container: "map",
-  style: "style.json",
+  style: "style-build.json",
   center: [lng, lat],
   zoom: zoom,
 });
+
+// var xratio = 0.05688476562;
+var xratio = 0.0878582202;
+// var yratio = 0.04944086074;
+var yratio = 0.0654494382;
+
+// min = 41.64
+// max = 42.02
+// average = 41.83
+
+// min = -87.86
+// max = -87.52
+// average = -87.69
+
+// 41.97961161002717, -87.85911190244606
+// 42.023229073363666, -87.6729293568596
+// 41.64501496942171, -87.52432141290845
+
+window.setTile = function (x, y) {
+  map.setZoom(14);
+  map.setCenter([-87.7 + x * xratio, 41.83 + y * yratio]);
+};
 
 // Add zoom and rotation controls to the map.
 map.addControl(new maplibregl.NavigationControl());
@@ -49,6 +73,7 @@ map.on("moveend", (e) => {
 });
 
 map.on("zoomend", (e) => {
+  console.log("zoomend", map.getZoom());
   writeLocalStorage("map.zoom", map.getZoom());
 });
 

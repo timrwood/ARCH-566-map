@@ -16,6 +16,12 @@ body {
   height: 1350px;  /* 9 in * 300 dpi; */
 }
 
+.page #map {
+  width: 2048px; /* 6.5 in * 300 dpi; */
+  height: 2048px;  /* 9 in * 300 dpi; */
+}
+
+
 .plot #map {
   width: 3027px; /* 34 in * 150 dpi; */
   height: 4096px;  /* 46 in * 150 dpi; */
@@ -35,6 +41,7 @@ body {
   right: 20px;
   bottom: 40px;
   z-index: 1;
+  /* display: none; */
 }
 
 #controls label {
@@ -78,8 +85,9 @@ body {
 }
 
 .marker {
-  font-size: 20px;
+  font-size: 100px;
   font-weight: bold;
-  color: black !important;
+  color: #f40 !important;
+  display: none;
 }
 
