@@ -18,6 +18,10 @@ var lng = +readLocalStorage("map.lng", -87.7);
 var lat = +readLocalStorage("map.lat", 41.86);
 var zoom = +readLocalStorage("map.zoom", 10);
 
+if (location.search === "?export") {
+  document.body.classList.add("export");
+}
+
 if (location.search === "?page") {
   document.body.classList.add("page");
   lng = -87.65;
@@ -119,10 +123,27 @@ class Location {
     this.address = address;
     this.city = city;
     this.marker = this.buildMarker();
+    this.path = this.buildSvgPath();
+    this.category.group.appendChild(this.path);
   }
 
   isValid() {
     return this.lat && this.lng;
+  }
+
+  buildSvgPath() {
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("d", window.getIconPath(this.category.name));
+    path.setAttribute("transform", this.svgTransform());
+    return path;
+  }
+
+  svgTransform() {
+    const x = (2048 * (this.lng + 87.7 + xratio * 2.5)) / xratio;
+    const y = (2048 * (41.83 - this.lat + yratio * 4.5)) / yratio;
+    return `translate(${x - 12}, ${y - 12}) scale(5)`;
+
+    // -87.7 + x * xratio, 41.83 + y * yratio
   }
 
   buildMarker() {
@@ -131,7 +152,7 @@ class Location {
     // create marker with popup
     const el = document.createElement("div");
     el.className = "marker";
-    el.textContent = this.category.glyph;
+    el.innerHTML = this.category.buildSvgIcon();
 
     return new maplibregl.Marker({ element: el })
       .setLngLat([this.lng, this.lat])
@@ -160,6 +181,27 @@ class Category {
     this.glyph = glyph;
     this.isActive = readLocalStorage(this.isActiveKey(), "true") === "true";
     this.locations = [];
+    // create svg group node
+    this.group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    this.group.setAttribute("id", this.name);
+    this.group.setAttribute("serif:id", this.name);
+    document.querySelector("#svg").appendChild(this.group);
+  }
+
+  buildSvgIconForeground() {
+    return `<svg viewBox="-6 -6 36 36" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
+      <path class="icon-foreground" d="${window.getIconPath(this.name)}" />
+    </svg>`;
+  }
+
+  buildSvgIconBackground() {
+    return `<svg viewBox="-6 -6 36 36" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
+      <path class="icon-background" d="${window.getIconPath(this.name)}" />
+    </svg>`;
+  }
+
+  buildSvgIcon() {
+    return this.buildSvgIconBackground() + this.buildSvgIconForeground();
   }
 
   isActiveKey() {
@@ -246,7 +288,7 @@ function buildCheckboxes() {
 
     const glyph = document.createElement("span");
     glyph.classList.add("glyph");
-    glyph.appendChild(document.createTextNode(category.glyph));
+    glyph.innerHTML = category.buildSvgIcon();
     span.appendChild(glyph);
 
     const label = document.createElement("label");

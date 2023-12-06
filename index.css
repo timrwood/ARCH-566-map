@@ -3,6 +3,7 @@ body {
   padding: 0;
 }
 
+
 #map {
   position: absolute;
   top: 0;
@@ -56,20 +57,26 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 16px;
   text-align: right;
-  padding-right: 8px;
-  width: 100%;
+  padding-right: 28px;
   line-height: 20px;
   font-weight: bold;
 }
 
 .glyph {
   display: inline-block;
-  width: 20px;
-  height: 20px;
-  line-height: 20px;
-  font-size: 20px;
-  text-align: center;
-  text-decoration: none !important;
+  width: 18px;
+  height: 18px;
+  position: absolute;
+  top: 1px;
+  right: 1px;
+}
+
+.glyph svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 18px;
+  height: 18px;
 }
 
 #controls input {
@@ -85,9 +92,58 @@ body {
 }
 
 .marker {
-  font-size: 100px;
-  font-weight: bold;
-  color: #f40 !important;
+  width: 18px;
+  height: 18px;
+}
+
+.marker svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 18px;
+  height: 18px;
+  z-index: 49;
+}
+
+.marker svg + svg {
+  z-index: 50;
+}
+
+#svg {
+  display: none;
+  width: auto;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: url(./images/super-map-70-invert.jpg) 0 0 no-repeat;
+  background-size: cover;
+  /* transform: scale(0.5);
+  transform-origin: 0 0; */
+}
+
+#svg path {
+  fill: #9acd32;
+  stroke: #fff;
+  stroke-width: 4;
+}
+
+.icon-foreground {
+  fill: #9acd32;
+  z-index: 89;
+}
+
+.icon-background {
+  stroke: #fff;
+  fill: #fff;
+  stroke-width: 12;
+  z-index: 90;
+}
+
+.export #map {
   display: none;
 }
 
+.export #svg {
+  display: block;
+}
